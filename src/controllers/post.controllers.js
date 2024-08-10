@@ -1,19 +1,22 @@
 const catchError = require('../utils/catchError');
 const Post = require('../models/Post');
+const User = require('../models/User');
 
 const getAll = catchError(async(req, res) => {
-    const results = await Post.findAll();
+    const results = await Post.findAll({include: [User]});
     return res.json(results);
 });
 
 const create = catchError(async(req, res) => {
-    const result = await Post.create(req.body);
+    const { id } = req.user;
+    const newBody = {...req.body, userId: id};
+    const result = await Post.create(newBody);
     return res.status(201).json(result);
 });
 
 const getOne = catchError(async(req, res) => {
     const { id } = req.params;
-    const result = await Post.findByPk(id);
+    const result = await Post.findByPk(id, {include: [User]});
     if(!result) return res.sendStatus(404);
     return res.json(result);
 });
@@ -27,6 +30,12 @@ const remove = catchError(async(req, res) => {
 
 const update = catchError(async(req, res) => {
     const { id } = req.params;
+
+    const deletedParameters = ['userId'];
+    deletedParameters.forEach((item) => {
+        delete req.body[item]
+    });
+
     const result = await Post.update(
         req.body,
         { where: {id}, returning: true }
