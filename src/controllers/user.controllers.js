@@ -2,9 +2,10 @@ const catchError = require('../utils/catchError');
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Favorite = require('../models/Favorite');
 
 const getAll = catchError(async(req, res) => {
-    const results = await User.findAll();
+    const results = await User.findAll({include: [Favorite]});
     return res.json(results);
 });
 
@@ -18,7 +19,7 @@ const create = catchError(async(req, res) => {
 
 const getOne = catchError(async(req, res) => {
     const { id } = req.params;
-    const result = await User.findByPk(id);
+    const result = await User.findByPk(id, {include: [Favorite]});
     if(!result) return res.sendStatus(404);
     return res.json(result);
 });
