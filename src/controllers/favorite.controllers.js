@@ -16,13 +16,31 @@ const setFavorite = catchError(async(req,res) => {
     
         // To create favorite elements:
     let createdFavorites = [];
+        // Management of errors:
+    let errors = [];
 
     for (let postId of postIds) {
+            // Check if the postId is already in "favorites"
+        const existingFavorite = await Favorite.findOne({
+            where: {
+                userId: parseInt(userId),
+                postId: parseInt(postId)
+            }
+        });
+
+        if(existingFavorite) {
+            errors.push(`Post with ID: ${userId} is already exist in favorites.`);
+            continue;
+        } 
+
         const favoritePost = await Favorite.create( {userId: parseInt(userId), postId: parseInt(postId)} );
         createdFavorites.push(favoritePost);
     }
 
-    return res.status(201).json(createdFavorites);
+    return res.status(201).json({
+        createdFavorites,
+        errors
+    });
 
 });
 
