@@ -11,7 +11,7 @@ This API provides user authentication with JSON Web Tokens (JWT) and password en
 - Sequelize
 - Bcrypt
 - JSON Web Tokens (JWT)
-- PostgreSQL (or any SQL database supported by Sequelize)
+- PostgreSQL 
 
 ## Diagram
 ![Diagram](./src/assets/authentication.png)
