@@ -1,6 +1,8 @@
 const catchError = require('../utils/catchError');
 const Favorite = require('../models/Favorite');
 
+/* Method used a Arrays with many postIds.
+
 const setFavorite = catchError(async(req,res) => {
         // route --> /users/:id/post
     const userId = req.user.id;
@@ -43,6 +45,36 @@ const setFavorite = catchError(async(req,res) => {
     });
 
 });
+*/
+
+const setFavorite = catchError(async(req,res) => {
+    // route --> /users/:id/post
+    const userId = req.user.id;
+    const { id } = req.params;
+
+        // validation (404)
+    if( parseInt(userId) !== parseInt(id)) return res.status(404);
+
+    const { postId } = req.body;
+
+    const existingFavorite = await Favorite.findOne({
+        where: {
+            userId: parseInt(userId),
+            postId: parseInt(postId)
+        }
+    });
+
+    if (existingFavorite) {
+        // Return error if the post is already a favorite
+        return res.status(400).json({ message: `Post with ID ${parseInt(postId)} already exists in favorites.` });
+    }
+
+    const favoritePost = await Favorite.create({ userId: parseInt(userId), postId: parseInt(postId) });
+
+    return res.status(201).json(favoritePost);
+ 
+});
+
 
 module.exports = {
     setFavorite
